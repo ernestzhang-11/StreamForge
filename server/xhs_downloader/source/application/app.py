@@ -363,6 +363,8 @@ class XHS:
         if not data:
             logging(log, _("{0} 提取数据失败").format(i), ERROR)
             return {}
+            
+        data["作品链接"] = url
         if data["作品类型"] == _("视频"):
             self.__extract_video(data, namespace)
         elif data["作品类型"] in {
