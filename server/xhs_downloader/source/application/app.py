@@ -14,14 +14,14 @@ from pydantic import Field
 from pyperclip import copy, paste
 from uvicorn import Config, Server
 
-from source.expansion import (
+from ..expansion import (
     BrowserCookie,
     Cleaner,
     Converter,
     Namespace,
     beautify_string,
 )
-from source.module import (
+from ..module import (
     __VERSION__,
     ERROR,
     MASTER,
@@ -40,7 +40,7 @@ from source.module import (
     logging,
     # sleep_time,
 )
-from source.translation import _, switch_language
+from ..translation import _, switch_language
 
 from ..module import Mapping
 from .download import Download
@@ -160,17 +160,13 @@ class XHS:
         container["下载地址"], container["动图地址"] = self.image.get_image_link(
             data, self.manager.image_format
         )
-    
-    def __extract_cover(self, container: dict, data: Namespace):
-        container["封面下载地址"], container["动图地址"] = self.image.get_image_link(
-            data, self.manager.image_format
-        )
+        container["封面下载地址"] = container["下载地址"][0]
 
     def __extract_video(self, container: dict, data: Namespace):
         container["下载地址"] = self.video.get_video_link(data)
-        container["动图地址"] = [
-            None,
-        ]
+        container["封面下载地址"], container["动图地址"] = self.image.get_image_link(
+            data, self.manager.image_format
+        )
 
     async def __download_files(
         self,
@@ -369,7 +365,6 @@ class XHS:
             return {}
         if data["作品类型"] == _("视频"):
             self.__extract_video(data, namespace)
-            self.__extract_cover(data, namespace)
         elif data["作品类型"] in {
             _("图文"),
             _("图集"),

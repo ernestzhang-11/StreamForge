@@ -3,10 +3,10 @@ from asyncio.exceptions import CancelledError
 from contextlib import suppress
 from sys import argv
 
-from source import Settings
-from source import XHS
-from source import XHSDownloader
-from source import cli
+from .source.application import XHS
+from .source.module import Settings
+from .source.TUI import XHSDownloader
+from .source.CLI import cli
 
 
 async def app():

@@ -13,9 +13,14 @@ project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-xhs_package_root = os.path.join(project_root, "xhs_downloader")
-if os.path.isdir(xhs_package_root) and xhs_package_root not in sys.path:
-    sys.path.insert(0, xhs_package_root)
+possible_xhs_paths = [
+    os.path.join(project_root, "xhs_downloader"),
+    os.path.join(project_root, "server", "xhs_downloader"),
+    os.path.join(current_dir, "xhs_downloader"),
+]
+for xhs_path in possible_xhs_paths:
+    if os.path.isdir(xhs_path) and xhs_path not in sys.path:
+        sys.path.insert(0, xhs_path)
 
 from product_mapping_service import load_product_mapping, map_product_name, extract_product_info
 
@@ -384,7 +389,7 @@ def parse_xhs_note():
                         'webp',
                     ]
                     for ext in possible_cover_extensions:
-                        cover_path_candidate = os.path.join(base_dir, f"{filename}.{ext}")
+                        cover_path_candidate = os.path.join(base_dir, f"{filename}_1.{ext}")
                         cover_token = upload_local_asset(cover_path_candidate, os.path.basename(cover_path_candidate))
                         if cover_token:
                             break

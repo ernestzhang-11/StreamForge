@@ -6,7 +6,7 @@ from warnings import warn
 from emoji import replace_emoji
 
 try:
-    from source.translation import _
+    from ..translation import _
 except ImportError:
     _ = lambda s: s
 

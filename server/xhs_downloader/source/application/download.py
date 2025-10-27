@@ -136,7 +136,7 @@ class Download:
             return []
         if self.__check_exists_path(path, f"{name}.{self.video_format}", log):
             return []
-        return [(urls[0], name, self.video_format), (cover_img[0], name, self.image_format)]
+        return [(urls[0], name, self.video_format), (cover_img[0], name + "_1", self.image_format)]
 
     def __ready_download_image(
         self,

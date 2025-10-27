@@ -16,14 +16,14 @@ from rich import print
 from rich.panel import Panel
 from rich.table import Table
 
-from source.application import XHS
-from source.expansion import BrowserCookie
-from source.module import (
+from ..application import XHS
+from ..expansion import BrowserCookie
+from ..module import (
     ROOT,
     PROJECT,
+    Settings,
 )
-from source.module import Settings
-from source.translation import switch_language, _
+from ..translation import switch_language, _
 
 __all__ = ["cli"]
 

@@ -1,4 +1,4 @@
-from source.expansion import Namespace
+from ..expansion import Namespace
 from .request import Html
 
 __all__ = ["Video"]

@@ -16,7 +16,7 @@ from rookiepy import (
 )
 
 try:
-    from source.translation import _
+    from ..translation import _
 except ImportError:
     _ = lambda s: s
 

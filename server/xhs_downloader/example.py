@@ -3,7 +3,7 @@ from asyncio import run
 from httpx import post
 from rich import print
 
-from source import XHS
+from .source.application import XHS
 
 
 async def example():
