@@ -320,6 +320,7 @@ def parse_xhs_note():
                 # 逐条上传（当前示例只处理第一条）
                 item = result["data"][0]
                 title = item.get("作品标题") or item.get("作品描述")
+                text = item.get("作品描述")
                 note_link = item.get("作品链接")
                 like_count = item.get("点赞数量")
                 author = item.get("作者昵称")
@@ -396,12 +397,26 @@ def parse_xhs_note():
                 except Exception:
                     cover_token = None
 
+                # 上传图片
+                img_tokens = []
+                if item['作品类型'] == '图文':
+                    for i, img_download_path in enumerate(item['下载地址']):
+                        img_name = f"{filename}_{i+1}.png"
+                        img_path_candidate = os.path.join(base_dir, img_name)
+                        img_token = upload_local_asset(img_path_candidate, os.path.basename(img_path_candidate))
+                        if img_token:
+                            img_tokens.append(img_token)
+
+
                 # 上传视频（仅使用本地已下载文件）
                 video_token = None
                 try:
-                    video_name = f"{filename}.mp4"
-                    video_path_candidate = os.path.join(base_dir, video_name)
-                    video_token = upload_local_asset(video_path_candidate, os.path.basename(video_path_candidate))
+                    possible_video_extensions = ["mp4", "mov"]
+                    for ext in possible_video_extensions:
+                        video_path_candidate = os.path.join(base_dir, f"{filename}.{ext}")
+                        video_token = upload_local_asset(video_path_candidate, os.path.basename(video_path_candidate))
+                        if video_token:
+                            break
                 except Exception:
                     video_token = None
 
@@ -418,18 +433,33 @@ def parse_xhs_note():
                 if note_id: fields['笔记ID'] = note_id
                 if comment_count is not None: fields['评论数'] = str(comment_count)
                 if collect_count is not None: fields['收藏数'] = str(collect_count)
+                if text: fields['文案'] = text
+
                 if cover_token:
                     fields['封面'] = [{
                         'file_token': cover_token,
                         'name': f"{filename}_cover",
                         'type': 'file',
                     }]
+
                 if video_token:
                     fields['视频'] = [{
                         'file_token': video_token,
                         'name': f"{filename}.mp4",
                         'type': 'file',
                     }]
+
+                if len(img_tokens) > 0:
+                    img_filds=[]
+                    for i, img_token in enumerate(img_tokens):
+                        img_filds.append({
+                            'file_token': img_token,
+                            'name': f"{filename}_{i}.png",
+                            'type': 'file',
+                        })
+
+                    fields['图片'] = img_filds
+
                 ok = feishu.create_xhs_record(fields, access_token=access_token)
                 result["feishu"] = {"ok": ok, "fields": fields}
         except Exception as e:
