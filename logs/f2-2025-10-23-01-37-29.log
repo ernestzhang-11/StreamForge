@@ -1,0 +1,5 @@
+2025-10-23 01:37:50,778 - f2 - INFO - 处理作品: 7563868439371894025 数据
+2025-10-23 01:37:53,548 - f2 - ERROR - HTTP状态错误：Client error '405 Method Not Allowed' for url 'https://api.day.app/'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405, URL：https://api.day.app/, 尝试次数：1
+2025-10-23 01:37:53,550 - f2 - ERROR - 请前往QA文档 https://f2.wiki/faq 查看相关帮助
+2025-10-23 01:37:53,552 - f2 - ERROR - Bark 通知发送失败，请检查 key 和网络连接：HTTP状态码错误： Status Code: 405

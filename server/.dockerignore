@@ -1,0 +1,9 @@
+downloads/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.env
+.env.example
+product_mapping.json

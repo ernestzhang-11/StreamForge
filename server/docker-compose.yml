@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    container_name: chrome_plugin_server
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./downloads:/app/downloads
+      - ./product_mapping.json:/app/product_mapping.json
+    command: ["gunicorn", "app:app", "--config", "gunicorn_conf.py"]

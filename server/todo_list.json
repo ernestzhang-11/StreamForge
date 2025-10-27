@@ -1,0 +1,6 @@
+[
+  {"content": "梳理飞书表格相关函数", "status": "done"},
+  {"content": "抽取飞书表格操作到独立模块", "status": "in_progress"},
+  {"content": "更新 app.py 使用新模块", "status": "todo"},
+  {"content": "验证并清理旧引用", "status": "todo"}
+]

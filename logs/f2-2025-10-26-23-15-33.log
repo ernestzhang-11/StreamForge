@@ -1,0 +1,46 @@
+2025-10-26 23:17:49,798 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_transports\default.py", line 257, in __aiter__
+    async for part in self._httpcore_stream:
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 407, in __aiter__
+    raise exc from None
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 403, in __aiter__
+    async for part in self._stream:
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\http11.py", line 342, in __aiter__
+    raise exc
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\http11.py", line 334, in __aiter__
+    async for chunk in self._connection._receive_response_body(**kwargs):
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\http11.py", line 203, in _receive_response_body
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_async\http11.py", line 213, in _receive_event
+    with map_exceptions({h11.RemoteProtocolError: RemoteProtocolError}):
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 155, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.RemoteProtocolError: peer closed connection without sending complete message body (received 94896128 bytes, expected 192477232)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\f2\dl\base_downloader.py", line 108, in _download_chunks
+    async for chunk in response.aiter_bytes(get_chunk_size(content_length)):
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_models.py", line 931, in aiter_bytes
+    async for raw_bytes in self.aiter_raw():
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_models.py", line 989, in aiter_raw
+    async for raw_stream_bytes in self.stream:
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_client.py", line 150, in __aiter__
+    async for chunk in self._stream:
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_transports\default.py", line 256, in __aiter__
+    with map_httpcore_exceptions():
+  File "C:\Users\Administrator\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 155, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "e:\python_project\chrome_plugin\.venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.RemoteProtocolError: peer closed connection without sending complete message body (received 94896128 bytes, expected 192477232)
+
+2025-10-26 23:17:49,818 - f2 - ERROR - 文件区块下载失败：<Request('GET', 'https://v3-web.douyinvod.com/20abada5360a05d670de5bc377f7ca27/68fe6749/video/tos/cn/tos-cn-ve-15c000-ce/o837DEgsQjRlVgByIC0HR8FvyeWFmJfgj5AehU/?a=6383&ch=26&cr=3&dr=0&lr=all&cd=0%7C0%7C0%7C3&cv=1&br=3815&bt=3815&cs=0&ds=4&ft=AJkeU_TERR0sTHC4NDv2Nc0iPMgzbLutSydU_4~vscGJNv7TGW&mime_type=video_mp4&qs=0&rc=OWVkOTo0OTw2OzhoaGg4PEBpajtyeGs5cm8zNjMzbGkzNEAvMDU2NGItNWAxM18tMDM0YSNpaV5sMmQ0ZHFhLS1kLWJzcw%3D%3D&btag=c0000e00030000&cquery=100z_100o_100w_100B_100x&dy_q=1761491855&feature_id=b1cb202f98cf51d95e455ae01e100ce9&l=202510262317353207D578276555F5950E')> Exception：peer closed connection without sending complete message body (received 94896128 bytes, expected 192477232)
+2025-10-26 23:17:49,827 - f2 - INFO - [green][  完成  ]：7564368186902433073_1761221701_video.mp4[/green]
+2025-10-26 23:19:50,876 - f2 - INFO - [green][  完成  ]：7564466973678095670_1761239742_video.mp4[/green]

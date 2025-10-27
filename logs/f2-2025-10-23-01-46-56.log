@@ -1,0 +1,287 @@
+2025-10-23 01:47:09,902 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 377, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 207, in handle_async_request
+    raise UnsupportedProtocol(
+        "Request URL is missing an 'http://' or 'https://' protocol."
+    )
+httpcore.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\f2\utils\_dl.py", line 40, in get_content_length
+    response = await aclient.head(url, headers=headers, follow_redirects=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1872, in head
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1585, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1674, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1702, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1739, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1776, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 376, in handle_async_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+2025-10-23 01:47:09,920 - f2 - ERROR - httpx 请求错误：file_cs，错误详情：Request URL is missing an 'http://' or 'https://' protocol.
+2025-10-23 01:47:09,922 - f2 - WARNING - 链接 file_cs 响应大小为 0 字节，尝试下一个链接是否可用
+2025-10-23 01:47:10,249 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 377, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 207, in handle_async_request
+    raise UnsupportedProtocol(
+        "Request URL is missing an 'http://' or 'https://' protocol."
+    )
+httpcore.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\f2\utils\_dl.py", line 40, in get_content_length
+    response = await aclient.head(url, headers=headers, follow_redirects=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1872, in head
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1585, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1674, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1702, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1739, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1776, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 376, in handle_async_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+2025-10-23 01:47:10,253 - f2 - ERROR - httpx 请求错误：height，错误详情：Request URL is missing an 'http://' or 'https://' protocol.
+2025-10-23 01:47:10,255 - f2 - WARNING - 链接 height 响应大小为 0 字节，尝试下一个链接是否可用
+2025-10-23 01:47:10,604 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 377, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 207, in handle_async_request
+    raise UnsupportedProtocol(
+        "Request URL is missing an 'http://' or 'https://' protocol."
+    )
+httpcore.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\f2\utils\_dl.py", line 40, in get_content_length
+    response = await aclient.head(url, headers=headers, follow_redirects=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1872, in head
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1585, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1674, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1702, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1739, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1776, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 376, in handle_async_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+2025-10-23 01:47:10,611 - f2 - ERROR - httpx 请求错误：uri，错误详情：Request URL is missing an 'http://' or 'https://' protocol.
+2025-10-23 01:47:10,614 - f2 - WARNING - 链接 uri 响应大小为 0 字节，尝试下一个链接是否可用
+2025-10-23 01:47:10,960 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 377, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 207, in handle_async_request
+    raise UnsupportedProtocol(
+        "Request URL is missing an 'http://' or 'https://' protocol."
+    )
+httpcore.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\f2\utils\_dl.py", line 40, in get_content_length
+    response = await aclient.head(url, headers=headers, follow_redirects=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1872, in head
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1585, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1674, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1702, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1739, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1776, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 376, in handle_async_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+2025-10-23 01:47:10,966 - f2 - ERROR - httpx 请求错误：url_list，错误详情：Request URL is missing an 'http://' or 'https://' protocol.
+2025-10-23 01:47:10,967 - f2 - WARNING - 链接 url_list 响应大小为 0 字节，尝试下一个链接是否可用
+2025-10-23 01:47:11,320 - f2 - ERROR - Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 72, in map_httpcore_exceptions
+    yield
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 377, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpcore\_async\connection_pool.py", line 207, in handle_async_request
+    raise UnsupportedProtocol(
+        "Request URL is missing an 'http://' or 'https://' protocol."
+    )
+httpcore.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\f2\utils\_dl.py", line 40, in get_content_length
+    response = await aclient.head(url, headers=headers, follow_redirects=True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1872, in head
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1585, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1674, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1702, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1739, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_client.py", line 1776, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 376, in handle_async_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "e:\python_project\chrome_plugin\venv\Lib\site-packages\httpx\_transports\default.py", line 89, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.UnsupportedProtocol: Request URL is missing an 'http://' or 'https://' protocol.
+
+2025-10-23 01:47:11,326 - f2 - ERROR - httpx 请求错误：width，错误详情：Request URL is missing an 'http://' or 'https://' protocol.
+2025-10-23 01:47:11,327 - f2 - WARNING - 链接 width 响应大小为 0 字节，尝试下一个链接是否可用
+2025-10-23 01:47:11,329 - f2 - WARNING - 所有链接都无法下载
+2025-10-23 01:47:11,330 - f2 - ERROR - [red][  丢失  ]：[/red]无法下载文件：7563576129932496137_video.mp4

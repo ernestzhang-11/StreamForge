@@ -1,0 +1,7 @@
+[
+  {"content": "梳理Lighthouse部署所需项与项目结构", "status": "done"},
+  {"content": "准备部署产物与Docker配置", "status": "done"},
+  {"content": "执行Lighthouse部署流程", "status": "blocked"},
+  {"content": "重命名项目根目录为StreamForge", "status": "in_progress"},
+  {"content": "更新代码中引用的旧目录名", "status": "pending"}
+]
