@@ -47,7 +47,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-XHS_COOKIE = "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-creator.xiaohongshu.com=customer.creator.AT-68c517556579582598742016duodpo7ujjtu3ga1; galaxy_creator_session_id=SpNvn7CTc5ppXqUjyT0C4apfx8tqu0Cz6bf8; galaxy.creator.beaker.session.id=1759403288114097431182; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517560580430535557126jxszodjyjbezmsmj; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517564424610949038084zkoc9ymcqn1o1nzg; access-token-fuwu.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; access-token-fuwu.beta.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; webBuild=4.83.1; xsecappid=xhs-pc-web; loadts=1761629141034; acw_tc=0ad5292217616294453871450e968e3b47f6dd7f50e403bc1bcbf24c9ec336; websectiga=2845367ec3848418062e761c09db7caf0e8b79d132ccdd1a4f8e64a11d0cac0d; sec_poison_id=5c343acb-516d-4f55-91a3-a0d4c4534777; web_session=040069b20b61e62f3b2e021e353b4bde3e475d; unread={%22ub%22:%2268ff22140000000004004630%22%2C%22ue%22:%2268ff3533000000000700af66%22%2C%22uc%22:23}"
+XHS_COOKIE = "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-creator.xiaohongshu.com=customer.creator.AT-68c517556579582598742016duodpo7ujjtu3ga1; galaxy_creator_session_id=SpNvn7CTc5ppXqUjyT0C4apfx8tqu0Cz6bf8; galaxy.creator.beaker.session.id=1759403288114097431182; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517560580430535557126jxszodjyjbezmsmj; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517564424610949038084zkoc9ymcqn1o1nzg; access-token-fuwu.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; access-token-fuwu.beta.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; webBuild=4.83.1; acw_tc=0ad62de417616561269087760ee8487ba3eddee1983b6b13353c393c06f771; websectiga=984412fef754c018e472127b8effd174be8a5d51061c991aadd200c69a2801d6; sec_poison_id=5a12ba16-4708-4fba-b00b-1b658501111c; web_session=040069b20b61e62f3b2e3989353b4b08593046; xsecappid=xhs-pc-web; loadts=1761657184570; unread={%22ub%22:%2269009278000000000503b57d%22%2C%22ue%22:%2268f36b8a0000000003038ebd%22%2C%22uc%22:31}"
 
 def upload_video_to_feishu(aweme_data: Dict[str, Any], page_url: str) -> Dict[str, Any]:
     video_path = aweme_data["video_path"]
@@ -219,17 +219,7 @@ def upload_record():
         import asyncio
         
         # 修复事件循环冲突问题 - 使用现有的事件循环
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        if loop.is_closed():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        aweme_data = loop.run_until_complete(download_with_f2(video_id))
+        aweme_data = asyncio.run(download_with_f2(video_id))
 
         # 上传视频到飞书
         upload_result = upload_video_to_feishu(aweme_data, page_url)
@@ -322,19 +312,9 @@ def parse_xhs_note():
                 return {"ok": True, "data": data}
 
         import asyncio
-        
-        # 修复事件循环冲突问题 - 使用现有的事件循环
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        if loop.is_closed():
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        
-        result = loop.run_until_complete(_do_parse())
+
+        result = asyncio.run(_do_parse())
+
         # 上传到飞书多维表格中
         try:
             if result.get("ok") and isinstance(result.get("data"), list):

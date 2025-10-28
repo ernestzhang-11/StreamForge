@@ -80,13 +80,7 @@ class XHS:
     SHORT = compile(r"(?:https?://)?xhslink\.com/[^\s\"<>\\^`{|}，。；！？、【】《》]+")
     ID = compile(r"(?:explore|item)/(\S+)?\?")
     ID_USER = compile(r"user/profile/[a-z0-9]+/(\S+)?\?")
-    __INSTANCE = None
     CLEANER = Cleaner()
-
-    def __new__(cls, *args, **kwargs):
-        if not cls.__INSTANCE:
-            cls.__INSTANCE = super().__new__(cls)
-        return cls.__INSTANCE
 
     def __init__(
         self,

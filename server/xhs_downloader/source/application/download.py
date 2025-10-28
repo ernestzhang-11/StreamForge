@@ -28,7 +28,6 @@ __all__ = ["Download"]
 
 
 class Download:
-    SEMAPHORE = Semaphore(MAX_WORKERS)
     CONTENT_TYPE_MAP = {
         "image/png": "png",
         "image/jpeg": "jpeg",
@@ -66,6 +65,7 @@ class Download:
         self.live_download = manager.live_download
         self.author_archive = manager.author_archive
         self.write_mtime = manager.write_mtime
+        self._semaphore = Semaphore(MAX_WORKERS)
 
     async def run(
         self,
@@ -210,7 +210,7 @@ class Download:
         log,
         bar,
     ):
-        async with self.SEMAPHORE:
+        async with self._semaphore:
             headers = self.headers.copy()
             # try:
             #     length, suffix = await self.__head_file(
@@ -227,6 +227,7 @@ class Download:
             #     )
             #     return False
             # temp = self.temp.joinpath(f"{name}.{suffix}")
+            self.temp.mkdir(parents=True, exist_ok=True)
             temp = self.temp.joinpath(f"{name}.{format_}")
             self.__update_headers_range(
                 headers,

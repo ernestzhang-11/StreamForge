@@ -1,7 +1,5 @@
 [
-  {"content": "梳理Lighthouse部署所需项与项目结构", "status": "done"},
-  {"content": "准备部署产物与Docker配置", "status": "done"},
-  {"content": "执行Lighthouse部署流程", "status": "blocked"},
-  {"content": "重命名项目根目录为StreamForge", "status": "in_progress"},
-  {"content": "更新代码中引用的旧目录名", "status": "pending"}
+  {"content": "定位 Temp 目录缺失导致下载失败的原因", "status": "done"},
+  {"content": "确保下载任务写入前创建临时目录", "status": "done"},
+  {"content": "回归验证 parse_xhs_note 并发流程", "status": "done"}
 ]
