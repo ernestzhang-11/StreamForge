@@ -217,7 +217,19 @@ def upload_record():
 
         # 下载视频
         import asyncio
-        aweme_data = asyncio.run(download_with_f2(video_id))
+        
+        # 修复事件循环冲突问题 - 使用现有的事件循环
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        aweme_data = loop.run_until_complete(download_with_f2(video_id))
 
         # 上传视频到飞书
         upload_result = upload_video_to_feishu(aweme_data, page_url)
@@ -310,8 +322,19 @@ def parse_xhs_note():
                 return {"ok": True, "data": data}
 
         import asyncio
-
-        result = asyncio.run(_do_parse())
+        
+        # 修复事件循环冲突问题 - 使用现有的事件循环
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        result = loop.run_until_complete(_do_parse())
         # 上传到飞书多维表格中
         try:
             if result.get("ok") and isinstance(result.get("data"), list):
