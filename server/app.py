@@ -47,7 +47,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-
+XHS_COOKIE = "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-creator.xiaohongshu.com=customer.creator.AT-68c517556579582598742016duodpo7ujjtu3ga1; galaxy_creator_session_id=SpNvn7CTc5ppXqUjyT0C4apfx8tqu0Cz6bf8; galaxy.creator.beaker.session.id=1759403288114097431182; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517560580430535557126jxszodjyjbezmsmj; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517564424610949038084zkoc9ymcqn1o1nzg; access-token-fuwu.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; access-token-fuwu.beta.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; webBuild=4.83.1; xsecappid=xhs-pc-web; loadts=1761629141034; acw_tc=0ad5292217616294453871450e968e3b47f6dd7f50e403bc1bcbf24c9ec336; websectiga=2845367ec3848418062e761c09db7caf0e8b79d132ccdd1a4f8e64a11d0cac0d; sec_poison_id=5c343acb-516d-4f55-91a3-a0d4c4534777; web_session=040069b20b61e62f3b2e021e353b4bde3e475d; unread={%22ub%22:%2268ff22140000000004004630%22%2C%22ue%22:%2268ff3533000000000700af66%22%2C%22uc%22:23}"
 
 def upload_video_to_feishu(aweme_data: Dict[str, Any], page_url: str) -> Dict[str, Any]:
     video_path = aweme_data["video_path"]
@@ -275,7 +275,6 @@ def parse_xhs_note():
         folder_name = "xhs"  # 作品文件储存文件夹名称（自动创建），默认值：Download
         name_format = "作品标题 发布时间 作品ID"
         user_agent = ""  # User-Agent
-        cookie = "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-creator.xiaohongshu.com=customer.creator.AT-68c517556579582598742016duodpo7ujjtu3ga1; galaxy_creator_session_id=SpNvn7CTc5ppXqUjyT0C4apfx8tqu0Cz6bf8; galaxy.creator.beaker.session.id=1759403288114097431182; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517560580430535557126jxszodjyjbezmsmj; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517564424610949038084zkoc9ymcqn1o1nzg; access-token-fuwu.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; access-token-fuwu.beta.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; webBuild=4.83.1; beaker.session.id=40893282ec867fc3f781b15aa7c099d30aef47d7gAJ9cQEoVQhfZXhwaXJlc3ECY2RhdGV0aW1lCmRhdGV0aW1lCnEDVQoH6QobBR4MCaBThVJxBFUDX2lkcQVVIDlhMmI4Y2Q2ZDdiNTQ1ODJiZjUyMjY5YTJhODEwYTJjcQZVDl9hY2Nlc3NlZF90aW1lcQdHQdo/dy4T+M9VDl9jcmVhdGlvbl90aW1lcQhHQdo/bHiyn5B1Lg==; xsecappid=xhs-pc-web; web_session=040069b20b61e62f3b2eacb6c83a4bd3a0b3ff; unread={%22ub%22:%2268ee1d03000000000703719a%22%2C%22ue%22:%2268f62000000000000302db12%22%2C%22uc%22:21}; websectiga=3fff3a6f9f07284b62c0f2ebf91a3b10193175c06e4f71492b60e056edcdebb2; sec_poison_id=6b4edcc8-9a2c-42fa-800c-1af30f5ce6b7; loadts=1761476993393"  # 小红书网页版 Cookie，无需登录，可选参数，登录状态对数据采集有影响
         timeout = 10  # 请求数据超时限制，单位：秒，默认值：10
         chunk = 1024 * 1024 * 10  # 下载文件时，每次从服务器获取的数据块大小，单位：字节
         max_retry = 2  # 请求数据失败时，重试的最大次数，单位：秒，默认值：5
@@ -293,7 +292,7 @@ def parse_xhs_note():
                 folder_name=folder_name,
                 name_format=name_format,
                 user_agent=user_agent,
-                cookie=cookie,
+                cookie=XHS_COOKIE,
                 timeout=timeout,
                 chunk=chunk,
                 max_retry=max_retry,
@@ -305,7 +304,7 @@ def parse_xhs_note():
                 language=language,
                 read_cookie=read_cookie,
             ) as xhs:
-                data = await xhs.extract(url, True, cookie=cookie)
+                data = await xhs.extract(url, True, cookie=XHS_COOKIE)
                 print(data)
                 
                 return {"ok": True, "data": data}
@@ -471,6 +470,40 @@ def parse_xhs_note():
         traceback.print_exc()
         return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
 
+
+@app.route("/xhs/parse_author", methods=["GET", "POST"])
+def parse_xhs_author():
+    # 获取URL参数
+    url = request.args.get('url')
+    
+    # 检查参数是否存在
+    if not url:
+        return jsonify({"ok": False, "error": "缺少url参数"}), 400
+    
+    # 从URL中提取小红书用户ID
+    import re
+    
+    # 正则表达式匹配小红书用户ID
+    user_pattern = r'/user/profile/([a-f0-9]{24})'
+    user_match = re.search(user_pattern, url)
+    
+    if not user_match:
+        result = {
+            "ok": False,
+            "error": "无法从URL中提取小红书用户ID",
+            "data": {
+                "original_url": url,
+                "extracted_success": False
+            }
+        }
+
+        return jsonify(result), 200
+        # 提取用户ID
+
+    user_id = user_match.group(1)
+    result = {}
+    
+    return jsonify(result), 200
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
