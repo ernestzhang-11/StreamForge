@@ -244,7 +244,7 @@ def upload_to_backend(video_url: str) -> dict:
     try:
         resp = requests.post(
             f"{BACKEND_BASE_URL}/feishu/upload_record",
-            json={"page_url": video_url}, timeout=30,
+            json={"page_url": video_url, "channel" :"bit_playwright"}, timeout=300,
             headers={"Content-Type": "application/json"}
         )
         data = resp.json()
@@ -325,6 +325,7 @@ async def run(keyword: str):
             try:
                 for _ in range(20):
                     await page.mouse.wheel(0, 1200)
+                    time.sleep(6)
                     await page.wait_for_timeout(2000)
             except Exception:
                 pass
@@ -441,8 +442,26 @@ if __name__ == "__main__":
             print("开始关键词采集:", kw)
             out = await run(kw)
             results.append({"keyword": kw, **(out or {})})
+            time.sleep(5)
             await asyncio.sleep(1)
         return results
 
-    out = asyncio.run(run_all(kws))
-    print(json.dumps(out, ensure_ascii=False, indent=2))
+    while True:
+        start_ts = datetime.now()
+        print(f"[{start_ts:%Y-%m-%d %H:%M:%S}] 开始新一轮关键词采集，共 {len(kws)} 个关键词")
+        try:
+            out = asyncio.run(run_all(kws))
+            print(json.dumps(out, ensure_ascii=False, indent=2))
+        except Exception as exc:
+            print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] 采集任务异常: {exc}")
+            traceback.print_exc()
+        finally:
+            end_ts = datetime.now()
+            elapsed = (end_ts - start_ts).total_seconds()
+            remaining = max(0.0, 1800 - elapsed)
+            if remaining > 0:
+                print(f"[{end_ts:%Y-%m-%d %H:%M:%S}] 本轮耗时 {elapsed:.1f} 秒，休眠 {remaining:.0f} 秒后再次运行")
+                time.sleep(remaining)
+            else:
+                print(f"[{end_ts:%Y-%m-%d %H:%M:%S}] 本轮耗时 {elapsed:.1f} 秒，立即开始下一轮")
+            closeBrowser(BIT_BROWSER_ID)

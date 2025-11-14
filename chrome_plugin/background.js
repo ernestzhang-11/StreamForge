@@ -1,5 +1,5 @@
 // const BACKEND_BASE_URL = "http://49.235.209.96:8080"; // 替换为你的服务器地址
-const BACKEND_BASE_URL = "http://192.168.0.100:5000"; // 替换为你的服务器地址
+const BACKEND_BASE_URL = "http://192.168.0.107:5000"; // 替换为你的服务器地址
 
 function getBackendUrl(path) {
   return `${BACKEND_BASE_URL}${path}`;

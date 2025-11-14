@@ -6,7 +6,7 @@ import re
 import sys
 import traceback
 from typing import Any, Dict, Optional
-from urllib.parse import parse_qs, urlparse, urlunparse
+from urllib.parse import parse_qs, urlparse
 
 current_dir = os.path.dirname(__file__)
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
@@ -36,6 +36,10 @@ import requests
 
 import feishu_table as feishu
 from xhs_downloader.source import Settings, XHS
+from xhs_provider import get_xhs_apis_class
+from xhs_url_parser import normalize_xhs_url, extract_note_info_from_url
+from xhs_downloader_util import download_note as download_xhs_note
+from xhs_handlers import parse_note_api_mode, parse_note_web_mode, upload_note_to_feishu
 
 
 load_dotenv()
@@ -47,9 +51,11 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
-XHS_COOKIE = "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-creator.xiaohongshu.com=customer.creator.AT-68c517556579582598742016duodpo7ujjtu3ga1; galaxy_creator_session_id=SpNvn7CTc5ppXqUjyT0C4apfx8tqu0Cz6bf8; galaxy.creator.beaker.session.id=1759403288114097431182; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517560580430535557126jxszodjyjbezmsmj; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517564424610949038084zkoc9ymcqn1o1nzg; access-token-fuwu.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; access-token-fuwu.beta.xiaohongshu.com=customer.fuwu.AT-68c517564424615243825152ee68hq01966biurf; webBuild=4.83.1; acw_tc=0ad62de417616561269087760ee8487ba3eddee1983b6b13353c393c06f771; websectiga=984412fef754c018e472127b8effd174be8a5d51061c991aadd200c69a2801d6; sec_poison_id=5a12ba16-4708-4fba-b00b-1b658501111c; web_session=040069b20b61e62f3b2e3989353b4b08593046; xsecappid=xhs-pc-web; loadts=1761657184570; unread={%22ub%22:%2269009278000000000503b57d%22%2C%22ue%22:%2268f36b8a0000000003038ebd%22%2C%22uc%22:31}"
+XHS_COOKIE = os.getenv("XHS_COOKIE", "gid=yYd2DyDqyWi2yYd2DyDJi4fDJYDluSUTYMUqhy9l7ShU6T28S4Wuvx888qWYKqY88yi0WiDq; a1=197ce1290423idqzjsg7hsrcugu3a13wd08m7yb0q50000412668; webId=f3a1a25308658bd5b4aae8b43c32c877; customerClientId=450717816262315; x-user-id-chengfeng.xiaohongshu.com=67f0badd000000000e01e3aa; abRequestId=f3a1a25308658bd5b4aae8b43c32c877; x-user-id-pgy.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-creator.xiaohongshu.com=637f22ae000000001f016b78; x-user-id-fuwu.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-school.xiaohongshu.com=67f0badd000000000e01e3aa; x-user-id-ark.xiaohongshu.com=67f0badd000000000e01e3aa; access-token-ark.xiaohongshu.com=customer.ark.AT-68c517562392902439419904z7kwckuxb7t1mdgk; customer-sso-sid=68c517570751913819783169q4h64286mumotqdn; access-token-chengfeng.xiaohongshu.com=customer.ad_wind.AT-68c517570751913819799553r1o9fqeirdrgflh2; solar.beaker.session.id=AT-68c517571272176093167616dsdsuftdnydvncj6; access-token-pgy.xiaohongshu.com=customer.pgy.AT-68c517571272176093167616dsdsuftdnydvncj6; access-token-pgy.beta.xiaohongshu.com=customer.pgy.AT-68c517571272176093167616dsdsuftdnydvncj6; web_session=040069b20b61e62f3b2e7ab3233b4b6b387f9e; webBuild=4.85.1; xsecappid=xhs-pc-web; websectiga=9730ffafd96f2d09dc024760e253af6ab1feb0002827740b95a255ddf6847fc8; sec_poison_id=787efd0f-bccc-4684-b5f3-0229ede63d75; acw_tc=0a0bb06417631201434704128e73dd25e46b426462e25c369ded6cc9398049; loadts=1763120264511; unread={%22ub%22:%22691129950000000003013bc9%22%2C%22ue%22:%226915fa47000000001b0334e3%22%2C%22uc%22:11}")
+XHS_MODE = os.getenv("XHS_MODE", "api").lower()
+# XHS_MODE = os.getenv("XHS_MODE", "web").lower()
 
-def upload_video_to_feishu(aweme_data: Dict[str, Any], page_url: str) -> Dict[str, Any]:
+def upload_video_to_feishu(aweme_data: Dict[str, Any], channel: str = "") -> Dict[str, Any]:
     video_path = aweme_data["video_path"]
     ct_raw = aweme_data.get("create_time")
     try:
@@ -81,6 +87,20 @@ def upload_video_to_feishu(aweme_data: Dict[str, Any], page_url: str) -> Dict[st
     product_mapping = load_product_mapping()
     product_name = extract_product_info(aweme_data)
     mapped_product_name = map_product_name(product_name, product_mapping)
+
+    if channel and channel == "bit_playwright":
+        if not product_name:
+            return {"success": False, "message": "飞书表格记录创建失败，产品名称IS NONE"}
+
+        find = False       
+        for keyword, mapped_value in product_mapping.items():
+            if keyword in product_name:
+                find = True
+                break
+
+        if not find:     
+            print(f"product_name: {product_name}")
+            return {"success": False, "message": "飞书表格记录创建失败，未找到对应的产品名称 "+ product_name}
 
     title = aweme_data.get("desc") or ""
 
@@ -150,7 +170,8 @@ async  def download_with_f2(video_id: str):
         'folderize': False,  # 不创建子文件夹
         'interval': 'all',  # 下载所有
         'path': DOWNLOAD_DIR,
-        'naming':"{aweme_id}_{create}"
+        'naming':"{aweme_id}_{create}",
+        'timeout': 30,  # 设置超时时间
     }
 
     async with DouyinCrawler(kwargs) as crawler:
@@ -193,6 +214,10 @@ def upload_record():
     #  检查链接
     j = request.get_json(force=True, silent=True) or {}
     page_url = j.get("page_url")
+    channel = j.get("channel")
+    if channel:
+        logging.info("upload_record channel=%s", channel)
+
     if not page_url or not isinstance(page_url, str):
         return jsonify({"ok": False, "error": "缺少或非法的 page_url"}), 400
     parsed = urlparse(page_url)
@@ -222,7 +247,7 @@ def upload_record():
         aweme_data = asyncio.run(download_with_f2(video_id))
 
         # 上传视频到飞书
-        upload_result = upload_video_to_feishu(aweme_data, page_url)
+        upload_result = upload_video_to_feishu(aweme_data, channel)
         if isinstance(upload_result, dict) and upload_result.get("success"):
             return jsonify({"ok": True, "message": upload_result.get("message", "视频上传成功"), "result": upload_result}), 200
         else:
@@ -235,278 +260,324 @@ def upload_record():
 
 @app.route("/xhs/parse_note", methods=["GET", "POST"])
 def parse_xhs_note():
+    """
+    解析小红书笔记接口
+
+    支持 GET 和 POST 请求
+    参数：url - 小红书笔记链接（支持短链接、discovery、explore格式）
+    """
     try:
-        query_params: Dict[str, str] = {}
+        # 1. 获取请求参数
         if request.method == "GET":
-            payload = request.args.to_dict(flat=True)
-            query_params.update(payload)
+            base_url = request.args.get("url", "").strip()
+
+            # 特殊处理：如果 URL 参数中包含未编码的 &，Flask 会将其拆分为多个参数
+            # 例如：url=...?source=webshare&xsec_token=xxx 会被拆分为 url=...?source=webshare 和 xsec_token=xxx
+            # 需要检查是否有 xsec_token、xsec_source、xhsshare 等参数需要重新拼接
+            if 'xiaohongshu.com' in base_url and '?' in base_url:
+                # 检查是否有被拆分的查询参数
+                extra_params = {}
+                for key in ['xsec_token', 'xsec_source', 'xhsshare', 'source']:
+                    if key in request.args and key not in base_url:
+                        extra_params[key] = request.args.get(key)
+
+                # 如果有额外的参数，重新拼接
+                if extra_params:
+                    # 手动拼接参数，避免 urlencode 对 = 进行编码
+                    params_list = [f"{k}={v}" for k, v in extra_params.items()]
+                    param_str = '&'.join(params_list)
+                    # 如果 base_url 已经有查询参数，用 & 连接，否则用 ?
+                    separator = '&' if '?' in base_url else '?'
+                    base_url = base_url + separator + param_str
+                    logging.info(f"重新组装 URL，添加参数: {list(extra_params.keys())}")
         else:
             payload = request.get_json(force=True, silent=True) or {}
-            if isinstance(payload, dict):
-                query_params.update({str(k): str(v) for k, v in payload.items() if v is not None})
+            base_url = payload.get("url", "").strip()
 
-        for key, value in request.args.items():
-            if value is not None and str(value).strip():
-                query_params[str(key)] = str(value)
-
-        base_url = query_params.get("url", "").strip()
         if not base_url:
             return jsonify({"ok": False, "error": "缺少必需参数 url"}), 400
 
-        parsed_url = urlparse(base_url)
-        base_query = parse_qs(parsed_url.query, keep_blank_values=True)
-        merged_query = {}
-        for key, values in base_query.items():
-            if values:
-                merged_query[key] = values[-1]
-        for key, value in query_params.items():
-            if key == "url":
-                continue
-            value_str = str(value).strip()
-            if value_str:
-                merged_query[key] = value_str
+        # 2. 解析并标准化链接
+        note_id, xsec_token, url = extract_note_info_from_url(base_url, XHS_COOKIE)
 
-        final_query_string = "&".join(
-            f"{key}={value}" for key, value in merged_query.items()
-        )
-        url = urlunparse(parsed_url._replace(query=final_query_string))
+        if not url or not note_id or not xsec_token:
+            return jsonify({
+                "ok": False,
+                "error": "无法解析小红书链接，请检查链接格式（需要包含笔记ID和xsec_token）"
+            }), 400
 
+        logging.info(f"解析小红书链接: note_id={note_id}, url={url}")
 
-        # 实例对象
-        work_path = DOWNLOAD_DIR  # 作品数据/文件保存根路径，默认值：项目根路径
-        folder_name = "xhs"  # 作品文件储存文件夹名称（自动创建），默认值：Download
-        name_format = "作品标题 发布时间 作品ID"
-        user_agent = ""  # User-Agent
-        timeout = 10  # 请求数据超时限制，单位：秒，默认值：10
-        chunk = 1024 * 1024 * 10  # 下载文件时，每次从服务器获取的数据块大小，单位：字节
-        max_retry = 2  # 请求数据失败时，重试的最大次数，单位：秒，默认值：5
-        image_format = "PNG"  # 图文作品文件下载格式，支持：AUTO、PNG、WEBP、JPEG、HEIC
-        image_download = True  # 图文、图集作品文件下载开关
-        video_download = True  # 视频作品文件下载开关
-        live_download = True  # 图文动图文件下载开关
-        download_record = False  # 是否记录下载成功的作品 ID
-        language = "zh_CN"  # 设置程序提示语言
-        read_cookie = None  # 读取浏览器 Cookie，支持设置浏览器名称（字符串）或者浏览器序号（整数），设置为 None 代表不读取
+        # 3. 根据模式解析笔记
+        if XHS_MODE == 'api':
+            result = parse_note_api_mode(url, XHS_COOKIE, DOWNLOAD_DIR)
+        else:
+            result = parse_note_web_mode(url, XHS_COOKIE, DOWNLOAD_DIR)
 
-        async def _do_parse() -> dict:
-            async with XHS(
-                work_path=work_path,
-                folder_name=folder_name,
-                name_format=name_format,
-                user_agent=user_agent,
-                cookie=XHS_COOKIE,
-                timeout=timeout,
-                chunk=chunk,
-                max_retry=max_retry,
-                image_format=image_format,
-                image_download=image_download,
-                video_download=video_download,
-                live_download=live_download,
-                download_record=download_record,
-                language=language,
-                read_cookie=read_cookie,
-            ) as xhs:
-                data = await xhs.extract(url, True, cookie=XHS_COOKIE)
-                print(data)
-                
-                return {"ok": True, "data": data}
+        # 4. 上传到飞书（如果解析成功）
+        if result.get("ok") and isinstance(result.get("data"), list) and len(result["data"]) > 0:
+            note_data = result["data"][0]
+            feishu_result = upload_note_to_feishu(note_data)
+            result["feishu"] = feishu_result
 
-        import asyncio
+            # 如果飞书上传失败，整体标记为失败
+            if not feishu_result.get("ok"):
+                result["ok"] = False
+                result["error"] = f"笔记解析成功，但上传到飞书失败: {feishu_result.get('error', '未知错误')}"
 
-        result = asyncio.run(_do_parse())
-
-        # 上传到飞书多维表格中
-        try:
-            if result.get("ok") and isinstance(result.get("data"), list):
-                access_token = feishu.get_tenant_access_token()
-                # 逐条上传（当前示例只处理第一条）
-                item = result["data"][0]
-                title = item.get("作品标题") or item.get("作品描述")
-                text = item.get("作品描述")
-                note_link = item.get("作品链接")
-                like_count = item.get("点赞数量")
-                author = item.get("作者昵称")
-                publish_time_raw = item.get("发布时间")
-                last_edit_time_raw = item.get("最后更新时间")
-                note_id = item.get("作品ID")
-                comment_count = item.get("评论数量")
-                collect_count = item.get("收藏数量")
-
-                # 优先使用本地已下载文件
-                base_dir = item.get("文件保存路径") or DOWNLOAD_DIR
-                filename = item.get("filename") or title or (note_id or "xhs")
-                # 规范化时间字符串并转为 Unix 时间戳（秒）
-                def normalize_dt(s: str) -> str:
-                    if not s:
-                        return ""
-                    s = s.replace("_", " ")
-                    parts = s.split()
-                    if len(parts) >= 2:
-                        parts[1] = parts[1].replace(".", ":")
-                        return parts[0] + " " + parts[1]
-                    return s.replace(".", ":")
-
-                def parse_timestamp(raw: str) -> int | None:
-                    raw = normalize_dt(raw)
-                    if not raw:
-                        return None
-                    try:
-                        dt = datetime.strptime(raw, "%Y-%m-%d %H:%M:%S")
-                        return int(dt.timestamp() * 1000)
-                    except ValueError:
-                        try:
-                            return int(float(raw))
-                        except (TypeError, ValueError):
-                            return None
-
-                publish_time_ts = parse_timestamp(publish_time_raw)
-                last_edit_time_ts = parse_timestamp(last_edit_time_raw)
-
-                def upload_local_asset(asset_path: str, asset_name: str) -> str | None:
-                    if not os.path.isfile(asset_path):
-                        return None
-                    upload_result = feishu.upload_file_to_bitable(
-                        file_path=asset_path,
-                        file_name=asset_name,
-                        parent_node=feishu.XHS_APP_TOKEN,
-                        parent_type="bitable_file",
-                        access_token=access_token,
-                    )
-                    if not upload_result.get("success"):
-                        logging.warning("上传资源失败: %s", upload_result.get("message"))
-                        return None
-                    file_token_value = upload_result.get("file_token")
-                    if not file_token_value:
-                        logging.warning("上传成功但没有返回 file_token")
-                        return None
-                    return file_token_value
-
-                # 上传封面（仅使用本地已下载文件）
-                cover_token = None
-                try:
-                    possible_cover_extensions = [
-                        (item.get('image_format') or 'png').lower(),
-                        'png',
-                        'jpg',
-                        'jpeg',
-                        'webp',
-                    ]
-                    for ext in possible_cover_extensions:
-                        cover_path_candidate = os.path.join(base_dir, f"{filename}_1.{ext}")
-                        cover_token = upload_local_asset(cover_path_candidate, os.path.basename(cover_path_candidate))
-                        if cover_token:
-                            break
-                except Exception:
-                    cover_token = None
-
-                # 上传图片
-                img_tokens = []
-                if item['作品类型'] == '图文':
-                    for i, img_download_path in enumerate(item['下载地址']):
-                        img_name = f"{filename}_{i+1}.png"
-                        img_path_candidate = os.path.join(base_dir, img_name)
-                        img_token = upload_local_asset(img_path_candidate, os.path.basename(img_path_candidate))
-                        if img_token:
-                            img_tokens.append(img_token)
-
-
-                # 上传视频（仅使用本地已下载文件）
-                video_token = None
-                try:
-                    possible_video_extensions = ["mp4", "mov"]
-                    for ext in possible_video_extensions:
-                        video_path_candidate = os.path.join(base_dir, f"{filename}.{ext}")
-                        video_token = upload_local_asset(video_path_candidate, os.path.basename(video_path_candidate))
-                        if video_token:
-                            break
-                except Exception:
-                    video_token = None
-
-                # 组装字段
-                fields = {}
-                if title: fields['标题'] = title
-                if note_link: fields['笔记链接'] = note_link
-                if like_count is not None: fields['点赞数'] = str(like_count)
-                if author: fields['作者'] = author
-                if publish_time_ts is not None:
-                    fields['发布时间'] = publish_time_ts
-                if last_edit_time_ts is not None:
-                    fields['最后编辑时间'] = last_edit_time_ts
-                if note_id: fields['笔记ID'] = note_id
-                if comment_count is not None: fields['评论数'] = str(comment_count)
-                if collect_count is not None: fields['收藏数'] = str(collect_count)
-                if text: fields['文案'] = text
-
-                if cover_token:
-                    fields['封面'] = [{
-                        'file_token': cover_token,
-                        'name': f"{filename}_cover",
-                        'type': 'file',
-                    }]
-
-                if video_token:
-                    fields['视频'] = [{
-                        'file_token': video_token,
-                        'name': f"{filename}.mp4",
-                        'type': 'file',
-                    }]
-
-                if len(img_tokens) > 0:
-                    img_filds=[]
-                    for i, img_token in enumerate(img_tokens):
-                        img_filds.append({
-                            'file_token': img_token,
-                            'name': f"{filename}_{i}.png",
-                            'type': 'file',
-                        })
-
-                    fields['图片'] = img_filds
-
-                ok = feishu.create_xhs_record(fields, access_token=access_token)
-                result["feishu"] = {"ok": ok, "fields": fields}
-        except Exception as e:
-            result["feishu_error"] = str(e)
-        
-        return jsonify(result), 200
+        # 根据结果决定状态码
+        if result.get("ok"):
+            # 成功时添加 success 字段
+            result["success"] = True
+            return jsonify(result), 200
+        else:
+            # 解析失败或上传失败，返回 500，不包含 success 字段
+            return jsonify(result), 500
     except Exception as e:
         logging.error("parse_xhs_note failed: %s", e)
         traceback.print_exc()
+        # 失败时不包含 success 字段
         return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
 
 
 @app.route("/xhs/parse_author", methods=["GET", "POST"])
 def parse_xhs_author():
-    # 获取URL参数
-    url = request.args.get('url')
-    
-    # 检查参数是否存在
-    if not url:
-        return jsonify({"ok": False, "error": "缺少url参数"}), 400
-    
-    # 从URL中提取小红书用户ID
-    import re
-    
-    # 正则表达式匹配小红书用户ID
-    user_pattern = r'/user/profile/([a-f0-9]{24})'
-    user_match = re.search(user_pattern, url)
-    
-    if not user_match:
-        result = {
-            "ok": False,
-            "error": "无法从URL中提取小红书用户ID",
-            "data": {
-                "original_url": url,
-                "extracted_success": False
-            }
+    """
+    解析小红书作者信息接口
+
+    支持 GET 和 POST 请求
+    参数：url - 作者主页链接或包含链接的文本
+    """
+    try:
+        # 1. 获取请求参数
+        if request.method == "GET":
+            base_url = request.args.get("url", "").strip()
+        else:
+            payload = request.get_json(force=True, silent=True) or {}
+            base_url = payload.get("url", "").strip()
+
+        if not base_url:
+            return jsonify({"ok": False, "error": "缺少必需参数 url"}), 400
+
+        logging.info(f"解析小红书作者: {base_url[:100]}")
+
+        # 2. 解析作者信息
+        from xhs_author_parser import parse_author
+        result = parse_author(base_url, XHS_COOKIE)
+
+        # 3. 如果解析成功，上传到飞书
+        if result.get("ok") and result.get("data"):
+            from xhs_author_uploader import upload_author_to_feishu
+            author_data = result["data"]
+            feishu_result = upload_author_to_feishu(author_data)
+            result["feishu"] = feishu_result
+
+            # 如果飞书上传失败，整体标记为失败
+            if not feishu_result.get("ok"):
+                result["ok"] = False
+                result["error"] = f"作者信息解析成功，但上传到飞书失败: {feishu_result.get('error', '未知错误')}"
+
+        # 根据结果决定状态码
+        if result.get("ok"):
+            # 成功时添加 success 字段
+            result["success"] = True
+            return jsonify(result), 200
+        else:
+            # 解析失败或上传失败，返回 500，不包含 success 字段
+            return jsonify(result), 500
+
+    except Exception as e:
+        logging.error("parse_xhs_author failed: %s", e)
+        traceback.print_exc()
+        # 失败时不包含 success 字段
+        return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
+
+
+@app.route("/xhs/parse_goods", methods=["GET", "POST"])
+def parse_xhs_goods():
+    """
+    解析小红书商品信息接口
+
+    支持 GET 和 POST 请求
+    参数：url - 商品链接或包含链接的文本
+    """
+    try:
+        # 1. 获取请求参数
+        if request.method == "GET":
+            base_url = request.args.get("url", "").strip()
+        else:
+            payload = request.get_json(force=True, silent=True) or {}
+            base_url = payload.get("url", "").strip()
+
+        if not base_url:
+            return jsonify({"ok": False, "error": "缺少必需参数 url"}), 400
+
+        logging.info(f"解析小红书商品: {base_url[:100]}")
+
+        # 2. 解析商品信息
+        from xhs_goods_parser import parse_goods
+        result = parse_goods(base_url, XHS_COOKIE)
+
+        # 3. 如果解析成功，上传到飞书
+        if result.get("ok") and result.get("data"):
+            from xhs_goods_uploader import upload_goods_to_feishu
+            goods_data = result["data"]
+            feishu_result = upload_goods_to_feishu(goods_data)
+            result["feishu"] = feishu_result
+
+            # 如果飞书上传失败，整体标记为失败
+            if not feishu_result.get("ok"):
+                result["ok"] = False
+                result["error"] = f"商品信息解析成功，但上传到飞书失败: {feishu_result.get('error', '未知错误')}"
+
+        # 根据结果决定状态码
+        if result.get("ok"):
+            # 成功时添加 success 字段
+            result["success"] = True
+            return jsonify(result), 200
+        else:
+            # 解析失败或上传失败，返回 500，不包含 success 字段
+            return jsonify(result), 500
+
+    except Exception as e:
+        logging.error("parse_xhs_goods failed: %s", e)
+        traceback.print_exc()
+        # 失败时不包含 success 字段
+        return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
+
+
+@app.route("/feishu/upload_file", methods=["POST"])
+def upload_file_to_feishu_table():
+    """
+    上传文件到飞书多维表格接口
+
+    参数：
+    - file: 文件（multipart/form-data）
+    - video_id: 视频ID（字符串）
+
+    返回：
+    - success: True 表示成功
+    - ok: True/False
+    - record_id: 飞书记录ID
+    - file_token: 文件token
+    """
+    try:
+        # 1. 检查参数
+        if 'file' not in request.files:
+            return jsonify({"ok": False, "error": "缺少必需参数 file"}), 400
+
+        if 'video_id' not in request.form:
+            return jsonify({"ok": False, "error": "缺少必需参数 video_id"}), 400
+
+        file = request.files['file']
+        video_id = request.form.get('video_id', '').strip()
+
+        if not video_id:
+            return jsonify({"ok": False, "error": "video_id 不能为空"}), 400
+
+        if file.filename == '':
+            return jsonify({"ok": False, "error": "未选择文件"}), 400
+
+        logging.info(f"上传文件到飞书: video_id={video_id}, filename={file.filename}")
+
+        # 2. 保存临时文件到项目 tmp 目录
+        temp_dir = os.path.join(os.path.dirname(__file__), "tmp")
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_path = os.path.join(temp_dir, file.filename)
+
+        file.save(temp_path)
+        logging.info(f"文件已保存到临时目录: {temp_path}")
+
+        # 3. 上传文件到飞书云盘
+        import feishu_table as feishu
+        access_token = feishu.get_tenant_access_token()
+
+        upload_result = feishu.upload_file_to_bitable(
+            file_path=temp_path,
+            file_name=file.filename,
+            access_token=access_token
+        )
+
+        if not upload_result or not upload_result.get("file_token"):
+            # 删除临时文件
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+            return jsonify({"ok": False, "error": "文件上传到飞书云盘失败"}), 500
+
+        file_token = upload_result["file_token"]
+        logging.info(f"文件上传成功，file_token: {file_token}")
+
+        # 4. 检查 video_id 是否已存在
+        existing = feishu.search_record_by_video_id(video_id, access_token=access_token)
+
+        if existing.get("total", 0) > 0:
+            # 记录已存在，更新附件
+            record_id = existing["items"][0].get("record_id")
+            logging.info(f"记录已存在: {record_id}, 更新附件")
+
+            # 更新记录（添加附件）
+            # 注意：这里需要使用 update_record 方法，但 feishu_table 可能没有，所以直接创建新记录
+            # 删除临时文件
+            try:
+                os.remove(temp_path)
+            except:
+                pass
+
+            return jsonify({
+                "ok": False,
+                "error": f"video_id {video_id} 已存在，record_id: {record_id}"
+            }), 400
+
+        # 5. 创建新记录
+        FEISHU_APP_TOKEN = os.getenv("FEISHU_APP_TOKEN", "Pyw7bsxDiaSkKXsBwUqc9DH4n5c")
+        FEISHU_TABLE_ID = os.getenv("FEISHU_TABLE_ID", "tblm8VXL99Bt9lcK")
+        FEISHU_FIELD_ATTACHMENT = os.getenv("FEISHU_FIELD_ATTACHMENT", "视频")
+        FEISHU_FIELD_VIDEO_ID = os.getenv("FEISHU_FIELD_VIDEO_ID", "video_id")
+
+        fields = {
+            FEISHU_FIELD_VIDEO_ID: video_id,
+            FEISHU_FIELD_ATTACHMENT: [{"file_token": file_token}]
         }
 
-        return jsonify(result), 200
-        # 提取用户ID
+        record = feishu.create_record(
+            fields,
+            access_token=access_token,
+            app_token=FEISHU_APP_TOKEN,
+            table_id=FEISHU_TABLE_ID
+        )
 
-    user_id = user_match.group(1)
-    result = {}
-    
-    return jsonify(result), 200
+        # 删除临时文件
+        try:
+            os.remove(temp_path)
+        except:
+            pass
+
+        if record:
+            record_id = record.get("record_id")
+            logging.info(f"成功创建飞书记录: {record_id}")
+            return jsonify({
+                "ok": True,
+                "success": True,
+                "record_id": record_id,
+                "file_token": file_token,
+                "video_id": video_id
+            }), 200
+        else:
+            return jsonify({"ok": False, "error": "创建飞书记录失败"}), 500
+
+    except Exception as e:
+        logging.error(f"upload_file_to_feishu_table failed: {e}")
+        traceback.print_exc()
+        # 删除临时文件
+        try:
+            if 'temp_path' in locals():
+                os.remove(temp_path)
+        except:
+            pass
+        return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
+
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))

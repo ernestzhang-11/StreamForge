@@ -1,0 +1,3 @@
+[submodule "Spider_XHS"]
+	path = Spider_XHS
+	url = https://github.com/cv-cat/Spider_XHS.git
