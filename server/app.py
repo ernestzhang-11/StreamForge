@@ -446,6 +446,67 @@ def parse_xhs_goods():
         return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
 
 
+@app.route("/feishu/check_video_exists", methods=["GET", "POST"])
+def check_video_exists():
+    """
+    检查视频在飞书多维表格中是否存在
+
+    参数：
+    - video_id: 视频ID（字符串）
+
+    返回：
+    - success: True 表示查询成功
+    - exists: True/False 表示视频是否存在
+    - record_id: 如果存在，返回记录ID
+    """
+    try:
+        # 获取 video_id 参数（支持 GET 和 POST）
+        if request.method == "GET":
+            video_id = request.args.get('video_id', '').strip()
+        else:
+            video_id = request.json.get('video_id', '').strip() if request.is_json else request.form.get('video_id', '').strip()
+
+        if not video_id:
+            return jsonify({"ok": False, "error": "缺少必需参数 video_id"}), 400
+
+        logging.info(f"检查视频是否存在: video_id={video_id}")
+
+        # 获取飞书访问令牌
+        import feishu_table as feishu
+        access_token = feishu.get_tenant_access_token()
+
+        # 查询 video_id 是否存在
+        existing = feishu.search_record_by_video_id(video_id, access_token=access_token)
+
+        if existing.get("total", 0) > 0:
+            # 视频已存在
+            record_id = existing["items"][0].get("record_id")
+            logging.info(f"视频存在: video_id={video_id}, record_id={record_id}")
+
+            return jsonify({
+                "ok": True,
+                "success": True,
+                "exists": True,
+                "video_id": video_id,
+                "record_id": record_id
+            }), 200
+        else:
+            # 视频不存在
+            logging.info(f"视频不存在: video_id={video_id}")
+
+            return jsonify({
+                "ok": True,
+                "success": True,
+                "exists": False,
+                "video_id": video_id
+            }), 200
+
+    except Exception as e:
+        logging.error(f"check_video_exists failed: {e}")
+        traceback.print_exc()
+        return jsonify({"ok": False, "error": f"{type(e).__name__}: {str(e)}"}), 500
+
+
 @app.route("/feishu/upload_file", methods=["POST"])
 def upload_file_to_feishu_table():
     """
@@ -480,7 +541,23 @@ def upload_file_to_feishu_table():
 
         logging.info(f"上传文件到飞书: video_id={video_id}, filename={file.filename}")
 
-        # 2. 保存临时文件到项目 tmp 目录
+        # 2. 获取飞书访问令牌并检查 video_id 是否已存在
+        import feishu_table as feishu
+        access_token = feishu.get_tenant_access_token()
+
+        existing = feishu.search_record_by_video_id(video_id, access_token=access_token)
+
+        if existing.get("total", 0) > 0:
+            # 记录已存在，直接返回失败，不上传文件
+            record_id = existing["items"][0].get("record_id")
+            logging.info(f"video_id {video_id} 已存在，record_id: {record_id}")
+
+            return jsonify({
+                "ok": False,
+                "error": f"video_id {video_id} 已存在，record_id: {record_id}"
+            }), 400
+
+        # 3. video_id 不存在，保存临时文件到项目 tmp 目录
         temp_dir = os.path.join(os.path.dirname(__file__), "tmp")
         os.makedirs(temp_dir, exist_ok=True)
         temp_path = os.path.join(temp_dir, file.filename)
@@ -488,10 +565,7 @@ def upload_file_to_feishu_table():
         file.save(temp_path)
         logging.info(f"文件已保存到临时目录: {temp_path}")
 
-        # 3. 上传文件到飞书云盘
-        import feishu_table as feishu
-        access_token = feishu.get_tenant_access_token()
-
+        # 4. 上传文件到飞书云盘
         upload_result = feishu.upload_file_to_bitable(
             file_path=temp_path,
             file_name=file.filename,
@@ -509,27 +583,6 @@ def upload_file_to_feishu_table():
         file_token = upload_result["file_token"]
         logging.info(f"文件上传成功，file_token: {file_token}")
 
-        # 4. 检查 video_id 是否已存在
-        existing = feishu.search_record_by_video_id(video_id, access_token=access_token)
-
-        if existing.get("total", 0) > 0:
-            # 记录已存在，更新附件
-            record_id = existing["items"][0].get("record_id")
-            logging.info(f"记录已存在: {record_id}, 更新附件")
-
-            # 更新记录（添加附件）
-            # 注意：这里需要使用 update_record 方法，但 feishu_table 可能没有，所以直接创建新记录
-            # 删除临时文件
-            try:
-                os.remove(temp_path)
-            except:
-                pass
-
-            return jsonify({
-                "ok": False,
-                "error": f"video_id {video_id} 已存在，record_id: {record_id}"
-            }), 400
-
         # 5. 创建新记录
         FEISHU_APP_TOKEN = os.getenv("FEISHU_APP_TOKEN", "Pyw7bsxDiaSkKXsBwUqc9DH4n5c")
         FEISHU_TABLE_ID = os.getenv("FEISHU_TABLE_ID", "tblm8VXL99Bt9lcK")
@@ -537,8 +590,8 @@ def upload_file_to_feishu_table():
         FEISHU_FIELD_VIDEO_ID = os.getenv("FEISHU_FIELD_VIDEO_ID", "video_id")
 
         fields = {
-            FEISHU_FIELD_VIDEO_ID: video_id,
-            FEISHU_FIELD_ATTACHMENT: [{"file_token": file_token}]
+            FEISHU_FIELD_VIDEO_ID: str(video_id),
+            FEISHU_FIELD_ATTACHMENT: [{"file_token": file_token, "name": file.filename,"type": "file"}]
         }
 
         record = feishu.create_record(
