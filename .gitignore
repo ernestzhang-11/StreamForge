@@ -6,8 +6,10 @@ __pycache__/
 /.run/
 /Volume/
 !/.github/
+/server/logs/
 /logs/
 /server/downloads/
+/downloads/
 
 # 使用 Spider_XHS 子模块，不需要 vendor 备份
 /server/spider_xhs/
