@@ -9,6 +9,7 @@ import logging
 import requests
 from typing import Dict, Any, Optional, List
 from retry import retry
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +99,9 @@ def download_media(save_path: str, filename: str, url: str, media_type: str) -> 
     Returns:
         是否下载成功
     """
+    file_path = None
+    temp_path = None
+
     try:
         if media_type == "image":
             extension = ".jpg"
@@ -113,28 +117,74 @@ def download_media(save_path: str, filename: str, url: str, media_type: str) -> 
             logger.info(f"文件已存在，跳过下载: {file_path}")
             return True
 
-        # 下载文件
+        # 下载到临时文件
+        temp_path = file_path + ".tmp"
         response = requests.get(url, stream=True, timeout=30)
         response.raise_for_status()
 
         total_size = 0
-        with open(file_path, "wb") as f:
+        with open(temp_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=chunk_size):
                 if chunk:
                     f.write(chunk)
                     total_size += len(chunk)
 
-        logger.info(f"下载成功: {file_path} ({total_size / 1024 / 1024:.2f}MB)")
+        logger.info(f"下载完成: {filename} ({total_size / 1024 / 1024:.2f}MB)")
+
+        # 对于图片，检测并转换格式
+        if media_type == "image":
+            try:
+                # 打开图片并检测格式
+                with Image.open(temp_path) as img:
+                    img_format = img.format
+                    logger.info(f"检测到图片格式: {img_format}")
+
+                    # 如果是 webp、gif 或其他不支持的格式，转换为 jpg
+                    if img_format and img_format.upper() in ['WEBP', 'GIF']:
+                        logger.info(f"转换 {img_format} 格式为 JPG...")
+
+                        # 转换为 RGB 模式（JPG 不支持透明通道）
+                        if img.mode in ('RGBA', 'LA', 'P'):
+                            # 创建白色背景
+                            background = Image.new('RGB', img.size, (255, 255, 255))
+                            if img.mode == 'P':
+                                img = img.convert('RGBA')
+                            background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                            img = background
+                        elif img.mode != 'RGB':
+                            img = img.convert('RGB')
+
+                        # 保存为 JPG 格式
+                        img.save(file_path, 'JPEG', quality=95, optimize=True)
+                        logger.info(f"格式转换成功: {file_path}")
+
+                        # 删除临时文件
+                        os.remove(temp_path)
+                    else:
+                        # 格式已经是 JPG/JPEG/PNG，直接移动文件
+                        os.rename(temp_path, file_path)
+
+            except Exception as img_error:
+                logger.error(f"图片格式转换失败: {img_error}")
+                # 如果转换失败，直接使用原文件
+                if os.path.exists(temp_path):
+                    os.rename(temp_path, file_path)
+        else:
+            # 视频文件直接重命名
+            os.rename(temp_path, file_path)
+
+        logger.info(f"文件保存成功: {file_path}")
         return True
 
     except Exception as e:
         logger.error(f"下载失败 {url}: {e}")
-        # 删除不完整的文件
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except:
-                pass
+        # 清理临时文件和不完整的文件
+        for path in [temp_path, file_path]:
+            if path and os.path.exists(path):
+                try:
+                    os.remove(path)
+                except:
+                    pass
         return False
 
 
